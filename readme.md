@@ -1,4 +1,4 @@
-# First Robotics Compotition Team 7254
+# First Robotics Competition Team 7254
 This is the reposotory for the 2020 season.
 It is currently being used to test autonomous.
 
