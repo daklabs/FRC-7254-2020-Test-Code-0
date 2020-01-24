@@ -7,9 +7,20 @@
 
 package frc.robot;
 
+// Robot
 import edu.wpi.first.wpilibj.TimedRobot;
+// Interface
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+// Other Imports
+import edu.wpi.first.wpilibj.Joystick;
+
+// Used for recording auton
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+//import com.ctre.phoenix.motorcontrol.InvertType;
+import com.ctre.phoenix.motorcontrol.can.*;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -24,6 +35,41 @@ public class Robot extends TimedRobot {
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
+  // Mortors - left
+  WPI_VictorSPX leftDrive = new WPI_VictorSPX(14);
+  WPI_VictorSPX leftSlave = new WPI_VictorSPX(15);
+  
+  // Motors - right
+  WPI_VictorSPX rightDrive = new WPI_VictorSPX(1);
+  WPI_VictorSPX rightSlave = new WPI_VictorSPX(0);
+  
+
+  // Recording auton
+  boolean isRecording = false;
+  boolean canRecord = true;
+  boolean hasStarted = false;
+	//autoNumber defines an easy way to change the file you are recording to/playing from, in case you want to make a
+	//few different auto programs
+	static final int autoNumber = 1;
+	//autoFile is a global constant that keeps you from recording into a different file than the one you play from
+  static final String autoFile = new String("/home/lvuser/recordedAuto" + autoNumber + ".csv");
+  
+  //Play and record file
+  BTMacroPlay player = null;
+  BTMacroRecord recorder = null;
+
+  // Joystick
+  Joystick joy = new Joystick(0);
+
+  double joystickX = 0;
+  double joystickY = 0;
+
+  Boolean getRecordButton() {
+    return joy.getRawButtonPressed(11);
+  }
+
+  // Insert cam here:
+
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
@@ -33,6 +79,16 @@ public class Robot extends TimedRobot {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
+
+    // Robot init
+     // Set inverted for both side and make the drive train.
+     leftDrive.setInverted(false);
+     leftSlave.setInverted(false);
+ 
+     rightDrive.setInverted(true);
+     rightSlave.setInverted(true);
+
+    
   }
 
   /**
@@ -45,6 +101,9 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
+    if(player!= null && !isAutonomous() && hasStarted) {
+			player.end(this);
+		}
   }
 
   /**
@@ -61,8 +120,14 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     m_autoSelected = m_chooser.getSelected();
+    hasStarted = true;
     // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
     System.out.println("Auto selected: " + m_autoSelected);
+    try {
+      player = new BTMacroPlay(autoFile);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
   }
 
   /**
@@ -70,14 +135,28 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousPeriodic() {
-    switch (m_autoSelected) {
-      case kCustomAuto:
-        // Put custom auto code here
-        break;
-      case kDefaultAuto:
-      default:
-        // Put default auto code here
-        break;
+    // switch (m_autoSelected) {
+    //   case kCustomAuto:
+    //     // Put custom auto code here
+    //     System.out.println("custom auto");
+        
+    //     break;
+    //   case kDefaultAuto:
+    //   default:
+    //     // Put default auto code here
+    //     break;
+    // }
+    if (player != null) {
+      player.play(this);
+    }
+  }
+
+  @Override
+  public void teleopInit() {
+    try {
+			recorder = new BTMacroRecord(autoFile);
+		} catch (IOException e) {
+			e.printStackTrace();
     }
   }
 
@@ -86,6 +165,57 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
+    //Save input
+    //String potterville = "Hola";
+    joystickX = joy.getX();
+    joystickY = -joy.getY();
+    
+    // Drive
+    setDrive(joystickX , joystickY);
+    //setDrive(joy.getX(), -joy.getY());
+    
+    // Toggle recording
+    if (this.getRecordButton()) {
+      isRecording = !isRecording;
+      if (isRecording) {
+        // Set the recording start time
+        System.out.println("Recording!");
+        recorder.startRecording();
+
+      } else {
+        //once we're done recording, the last thing we'll do is clean up the recording using the end
+        //function. more info on the end function is in the record class
+        System.out.println("Ending Recording!");
+        isRecording = false;
+        canRecord = false;
+        try {
+          if(recorder != null) {
+            recorder.end();
+          }
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
+    }  
+
+    // Record if needed
+    //if our record button has been pressed, lets start recording!
+    if (isRecording && canRecord) {
+        try {
+        //if we succesfully have made the recorder object, lets start recording stuff
+        //2220 uses a storage object that we can get motors values, etc. from.
+        //if you don't need to pass an object like that in, modify the methods/classes
+        if(recorder != null) {
+          recorder.record(this);
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+
+    if (joy.getRawButtonPressed(12)) {
+      
+    }
   }
 
   /**
@@ -93,5 +223,34 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void testPeriodic() {
+    setDrive(joy.getX(), -joy.getY());
+  }
+
+  // Method to set the drive train baised on joyX and Y, converts joystick to tank drive
+  public void setDrive(double joyX, double joyY) {
+    double y = joyY * 0.8;
+    double x = joyX * 0.8;
+
+    //System.out.println("X: " + x + " Y: " + y);
+  
+    // Deadband - within 10% joystick, make it zero
+    if (Math.abs(y) < 0.10) {
+      y = 0;
+    }
+    if (Math.abs(x) < 0.10) {
+      x = 0;
+    }
+    
+    double v = (1 - Math.abs(x)) * (y) + y;
+    double w = (1 - Math.abs(y)) * (x) + x;
+  
+    double l = (v+w)/2;
+    double r = (v-w)/2;
+  
+    this.leftDrive.set(l);
+    this.leftSlave.set(l);
+  
+    this.rightDrive.set(r);
+    this.rightSlave.set(r);
   }
 }
