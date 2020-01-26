@@ -55,15 +55,6 @@ public class BTMacroRecord {
 			// writer.append("," + robot.rightDrive.get());		
 			// writer.append("," + robot.rightSlave.get());
 			
-			// //barrel motors
-			// writer.append("," + storage.robot.getBarrelMotorLeft().get());
-			// writer.append("," + storage.robot.getBarrelMotorRight().get());
-			
-			// //fork motors
-			// writer.append("," + storage.robot.getLeftForkLeft().get());
-			// writer.append("," + storage.robot.getLeftForkRight().get());
-			// writer.append("," + storage.robot.getRightForkLeft().get());
-			// writer.append("," + storage.robot.getRightForkRight().get());
 			/*
 			* THE LAST ENTRY OF THINGS YOU RECORD NEEDS TO HAVE A DELIMITER CONCATENATED TO 
 			* THE STRING AT THE END. OTHERWISE GIVES NOSUCHELEMENTEXCEPTION

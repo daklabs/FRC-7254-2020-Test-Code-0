@@ -64,16 +64,6 @@ public class BTMacroPlay {
 				// robot.rightDrive.set(scanner.nextDouble());
 				// robot.rightSlave.set(scanner.nextDouble());
 				
-				// storage.robot.getBarrelMotorLeft().setX(scanner.nextDouble());
-				// storage.robot.getBarrelMotorRight().setX(scanner.nextDouble());
-				
-				// storage.robot.getLeftForkLeft().setX(scanner.nextDouble());
-				// storage.robot.getLeftForkRight().setX(scanner.nextDouble());
-				// storage.robot.getRightForkLeft().setX(scanner.nextDouble());
-				// storage.robot.getRightForkRight().setX(scanner.nextDouble());
-				
-				// storage.robot.getToteClamp().set(storage.robot.getToteClamp().isExtended());
-				
 				//go to next double
 				onTime = true;
 			}
@@ -95,21 +85,12 @@ public class BTMacroPlay {
 	
 	//stop motors and end playing the recorded file
 	public void end(Robot robot) {
-		robot.leftDrive.set(0);
-        robot.leftSlave.set(0);
-		robot.rightDrive.set(0);
-		robot.rightSlave.set(0);
-		
-		// robot.robot.getBarrelMotorLeft().setX(0);
-		// robot.robot.getBarrelMotorRight().setX(0);
-		
-		// robot.robot.getLeftForkLeft().setX(0);
-		// robot.robot.getLeftForkRight().setX(0);
-		// robot.robot.getRightForkLeft().setX(0);
-		// robot.robot.getRightForkRight().setX(0);
-		// //all this mess of a method does is keep the piston in the same state it ended in
-		// //if you want it to return to a specific point at the end of auto, change that here
-		// robot.robot.getToteClamp().set(robot.robot.getToteClamp().isExtended());
+		robot.setDrive(scanner.nextDouble(), scanner.nextDouble());
+
+		// robot.leftDrive.set(0);
+        // robot.leftSlave.set(0);
+		// robot.rightDrive.set(0);
+		// robot.rightSlave.set(0);
 		
 		if (scanner != null) {
 			scanner.close();
