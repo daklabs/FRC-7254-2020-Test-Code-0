@@ -1,7 +1,6 @@
 # First Robotics Competition Team 7254
 This is the reposotory for the 2020 season.
-It is currently being used to test autonomous.
 
-Uses modified code from Team 2220's [FRC-Play-Record-Macro](https://github.com/DennisMelamed/FRC-Play-Record-Macro) reposotory.
+It is split into projects named based on the year, week, and incrementing letters if there are multiple projects created in a week.
 
-Requires WPILib and CTRE Pheonix libraries to use.
+20w04b is testing autonomus. 20w05a is testing the color sensor found in the kit of parts.
