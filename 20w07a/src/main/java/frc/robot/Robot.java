@@ -117,6 +117,9 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Blue", detectedColor.blue);
     SmartDashboard.putNumber("Confidence", match.confidence);
     SmartDashboard.putString("Detected Color", colorString);
+
+    // Put distence estimate in SmartDashboard
+    SmartDashboard.putNumber("Distance", currentDistance);
   }
 
   /**
