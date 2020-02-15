@@ -209,14 +209,10 @@ public class Robot extends TimedRobot {
     }
   }
 
-  @Override
-  public void teleopInit() {
-    try {
-			recorder = new BTMacroRecord(autoFile);
-		} catch (IOException e) {
-			e.printStackTrace();
-    }
-  }
+  // @Override
+  // public void teleopInit() {
+    
+  // }
 
   /**
    * This function is called periodically during operator control.
@@ -224,6 +220,15 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     setDrive(joy.getX(), -joy.getY());
+  }
+
+  @Override
+  public void testInit() {
+    try {
+			recorder = new BTMacroRecord(autoFile);
+		} catch (IOException e) {
+			e.printStackTrace();
+    }
   }
 
   /**
