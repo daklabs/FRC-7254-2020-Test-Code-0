@@ -53,6 +53,10 @@ public class Robot extends TimedRobot {
     WPI_VictorSPX rightDrive = new WPI_VictorSPX(13);
     WPI_VictorSPX rightSlave = new WPI_VictorSPX(14);
 
+    // Motor - Elevator
+    WPI_VictorSPX elevator = new WPI_VictorSPX(12);
+
+
     // Joystick
     Joystick joy = new Joystick(0);
 
@@ -217,9 +221,20 @@ public class Robot extends TimedRobot {
   /**
    * This function is called periodically during operator control.
    */
+  // spin color wheel, then more lemons, then set color.
   @Override
   public void teleopPeriodic() {
     setDrive(joy.getX(), -joy.getY());
+
+    // Elevator control -temp-
+    double elevatorSpeed = 0;
+    //gets the hat input, -1 for no input, 0 for up, 180 for down
+    if (joy.getPOV() == 0) {
+      elevatorSpeed = 0.4;
+    } else if (joy.getPOV() == 180) {
+      elevatorSpeed = -0.8;
+    }
+    elevator.set(elevatorSpeed);
   }
 
   @Override
