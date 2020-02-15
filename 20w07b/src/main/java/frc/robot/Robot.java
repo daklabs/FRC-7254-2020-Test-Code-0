@@ -56,6 +56,9 @@ public class Robot extends TimedRobot {
     // Motor - Elevator
     WPI_VictorSPX elevator = new WPI_VictorSPX(12);
 
+    // Motor - Spinner
+    WPI_VictorSPX spinner = new WPI_VictorSPX(3);
+
 
     // Joystick
     Joystick joy = new Joystick(0);
@@ -235,6 +238,13 @@ public class Robot extends TimedRobot {
       elevatorSpeed = -0.8;
     }
     elevator.set(elevatorSpeed);
+
+    // Spinner control -temp-
+    double spinSpeed = 0;
+    if (joy.getRawButton(2)) {
+      spinSpeed = 0.5;
+    }
+    spinner.set(spinSpeed);
   }
 
   @Override
