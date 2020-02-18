@@ -34,7 +34,7 @@ public class Robot extends TimedRobot {
   private static final String kCustomAuto = "My Auto";
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
-
+  
   // Mortors - left
   WPI_VictorSPX leftDrive = new WPI_VictorSPX(14);
   WPI_VictorSPX leftSlave = new WPI_VictorSPX(15);
@@ -59,13 +59,21 @@ public class Robot extends TimedRobot {
   BTMacroRecord recorder = null;
 
   // Joystick
-  Joystick joy = new Joystick(0);
+  Joystick joy = new Joystick(1);
 
   double joystickX = 0;
   double joystickY = 0;
 
   Boolean getRecordButton() {
     return joy.getRawButtonPressed(11);
+  }
+
+  double getTurn(){
+    return joy.getRawAxis(0);
+  }
+
+  double getFoward(){
+    return -joy.getRawAxis(5);
   }
 
   // Insert cam here:
@@ -167,8 +175,12 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     //Save input
     //String potterville = "Hola";
-    joystickX = joy.getX();
-    joystickY = -joy.getY();
+
+    // get raw axis depends on the controler:
+    // For the flight stick, axis 0 is X, 1 is Y, and 2 is Z,
+    // For xbox, axis 0 is LX, 1 is LY, 4 is RX, 5 is RY,
+    joystickX = getTurn();
+    joystickY = getFoward();
     
     // Drive
     setDrive(joystickX , joystickY);
@@ -223,13 +235,13 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void testPeriodic() {
-    setDrive(joy.getX(), -joy.getY());
+    setDrive(getTurn(), getFoward());
   }
 
   // Method to set the drive train baised on joyX and Y, converts joystick to tank drive
   public void setDrive(double joyX, double joyY) {
-    double y = joyY * 0.8;
-    double x = joyX * 0.8;
+    double y = joyY * 0.5;
+    double x = joyX * 0.4;
 
     //System.out.println("X: " + x + " Y: " + y);
   
