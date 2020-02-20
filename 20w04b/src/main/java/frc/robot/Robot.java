@@ -59,7 +59,7 @@ public class Robot extends TimedRobot {
   BTMacroRecord recorder = null;
 
   // Joystick
-  Joystick joy = new Joystick(1);
+  Joystick joy = new Joystick(0);
 
   double joystickX = 0;
   double joystickY = 0;
@@ -240,7 +240,7 @@ public class Robot extends TimedRobot {
 
   // Method to set the drive train baised on joyX and Y, converts joystick to tank drive
   public void setDrive(double joyX, double joyY) {
-    double y = joyY * 0.5;
+    double y = joyY * 0.6;
     double x = joyX * 0.4;
 
     //System.out.println("X: " + x + " Y: " + y);
