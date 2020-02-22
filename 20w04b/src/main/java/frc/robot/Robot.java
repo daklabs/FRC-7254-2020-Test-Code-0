@@ -14,13 +14,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // Other Imports
 import edu.wpi.first.wpilibj.Joystick;
+import com.ctre.phoenix.motorcontrol.can.*;
 
 // Used for recording auton
 import java.io.FileNotFoundException;
 import java.io.IOException;
-
-//import com.ctre.phoenix.motorcontrol.InvertType;
-import com.ctre.phoenix.motorcontrol.can.*;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -30,9 +28,9 @@ import com.ctre.phoenix.motorcontrol.can.*;
  * project.
  */
 public class Robot extends TimedRobot {
-  private static final String kDefaultAuto = "Default";
-  private static final String kCustomAuto = "My Auto";
-  private String m_autoSelected;
+  private static final String kXboxJoy = "xbox";
+  private static final String kFlightstick = "flightstick";
+  private String joySelect;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
   
   // Mortors - left
@@ -73,7 +71,24 @@ public class Robot extends TimedRobot {
   }
 
   double getFoward(){
-    return -joy.getRawAxis(5);
+    double joyF;
+    switch (joySelect) {
+      case kXboxJoy:
+        // XBox controler is selected.
+        joyF = -joy.getRawAxis(5);
+
+        break;
+      case kFlightstick:
+        // Flightstick is selected.
+        joyF = -joy.getRawAxis(1);
+
+        break;
+      default:
+        // So it doesn't yell at me.
+        joyF = 0;
+        break;
+    }
+    return joyF;
   }
 
   // Insert cam here:
@@ -84,9 +99,9 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-    m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
-    m_chooser.addOption("My Auto", kCustomAuto);
-    SmartDashboard.putData("Auto choices", m_chooser);
+    m_chooser.setDefaultOption("Xbox Controler", kXboxJoy);
+    m_chooser.addOption("Flightstick", kFlightstick);
+    SmartDashboard.putData("Joystick choices", m_chooser);
 
     // Robot init
      // Set inverted for both side and make the drive train.
@@ -95,8 +110,6 @@ public class Robot extends TimedRobot {
  
      rightDrive.setInverted(true);
      rightSlave.setInverted(true);
-
-    
   }
 
   /**
@@ -109,6 +122,8 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
+    joySelect = m_chooser.getSelected();
+
     if(player!= null && !isAutonomous() && hasStarted) {
 			player.end(this);
 		}
@@ -127,10 +142,10 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-    m_autoSelected = m_chooser.getSelected();
-    hasStarted = true;
+    // m_autoSelected = m_chooser.getSelected();
     // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
-    System.out.println("Auto selected: " + m_autoSelected);
+    // System.out.println("Auto selected: " + m_autoSelected);
+    hasStarted = true;
     try {
       player = new BTMacroPlay(autoFile);
 		} catch (FileNotFoundException e) {
@@ -143,17 +158,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousPeriodic() {
-    // switch (m_autoSelected) {
-    //   case kCustomAuto:
-    //     // Put custom auto code here
-    //     System.out.println("custom auto");
-        
-    //     break;
-    //   case kDefaultAuto:
-    //   default:
-    //     // Put default auto code here
-    //     break;
-    // }
+    // Play Macro if player exists
     if (player != null) {
       player.play(this);
     }
