@@ -43,6 +43,11 @@ public class Robot extends TimedRobot {
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
+  // Pick Joystick
+  private static final String kXboxJoy = "xbox";
+  private static final String kFlightstick = "flightstick";
+  private String joySelect;
+  private final SendableChooser<String> j_chooser = new SendableChooser<>();
   
   // 2020 robot mortors
     // Mortors - left
@@ -65,6 +70,31 @@ public class Robot extends TimedRobot {
 
     double joystickX = 0;
     double joystickY = 0;
+
+    double getTurn(){
+      return joy.getRawAxis(0);
+    }
+  
+    double getFoward(){
+      double joyF;
+      switch (joySelect) {
+        case kXboxJoy:
+          // XBox controler is selected.
+          joyF = -joy.getRawAxis(5);
+  
+          break;
+        case kFlightstick:
+          // Flightstick is selected.
+          joyF = -joy.getRawAxis(1);
+  
+          break;
+        default:
+          // So it doesn't yell at me.
+          joyF = 0;
+          break;
+      }
+      return joyF;
+    }
 
   // Recording auton
     boolean isRecording = false;
@@ -130,6 +160,11 @@ public class Robot extends TimedRobot {
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
 
+    // Joystick chooser
+    j_chooser.setDefaultOption("Xbox Controler", kXboxJoy);
+    j_chooser.addOption("Flightstick", kFlightstick);
+    SmartDashboard.putData("Joystick choices", j_chooser);
+
     // Set inverted for both side and make the drive train.
     boolean leftInverted = false;
     leftDrive.setInverted(leftInverted);
@@ -155,6 +190,8 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
+    // Joystick handeling
+    joySelect = j_chooser.getSelected();
     // Auto handeling
     if(player!= null && !isAutonomous() && hasStarted) {
 			player.end(this);
@@ -224,9 +261,7 @@ public class Robot extends TimedRobot {
 		}
   }
 
-  /**
-   * This function is called periodically during autonomous.
-   */
+  // This function is called periodically during autonomous.
   @Override
   public void autonomousPeriodic() {
     // Play the macro
@@ -240,13 +275,11 @@ public class Robot extends TimedRobot {
     
   // }
 
-  /**
-   * This function is called periodically during operator control.
-   */
+  // This function is called periodically during operator control.
   // spin color wheel, then more lemons, then set color.
   @Override
   public void teleopPeriodic() {
-    setDrive(joy.getX(), -joy.getY());
+    setDrive(getTurn(), getFoward());
 
     // Elevator control -temp-
     double elevatorSpeed = 0;
@@ -264,7 +297,7 @@ public class Robot extends TimedRobot {
       lastColor = colorString;
       spin = !spin;
     }
-    if (spin == true) {
+    if (spin == true && spinCount < 8*3) {
       if (lastColor == RED && colorString == GREEN) {
         spinCount++;
         lastColor = colorString;
@@ -297,15 +330,12 @@ public class Robot extends TimedRobot {
     }
   }
 
-  /**
-   * This function is called periodically during test mode.
-   */
+  // This function is called periodically during test mode.
   @Override
   public void testPeriodic() {
     //Save input
-    //String potterville = "Hola";
-    joystickX = joy.getX();
-    joystickY = -joy.getY();
+    joystickX = getTurn();
+    joystickY = getFoward();
     
     // Drive
     setDrive(joystickX , joystickY);
@@ -352,8 +382,8 @@ public class Robot extends TimedRobot {
   }
 
   public void setDrive(double joyX, double joyY) {
-    double y = joyY * 0.8;
-    double x = joyX * 0.8;
+    double y = joyY * 0.6;
+    double x = joyX * 0.4;
 
     //System.out.println("X: " + x + " Y: " + y);
   

@@ -31,7 +31,7 @@ public class Robot extends TimedRobot {
   private static final String kXboxJoy = "xbox";
   private static final String kFlightstick = "flightstick";
   private String joySelect;
-  private final SendableChooser<String> m_chooser = new SendableChooser<>();
+  private final SendableChooser<String> j_chooser = new SendableChooser<>();
   
   // Mortors - left
   WPI_VictorSPX leftDrive = new WPI_VictorSPX(14);
@@ -99,9 +99,9 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-    m_chooser.setDefaultOption("Xbox Controler", kXboxJoy);
-    m_chooser.addOption("Flightstick", kFlightstick);
-    SmartDashboard.putData("Joystick choices", m_chooser);
+    j_chooser.setDefaultOption("Xbox Controler", kXboxJoy);
+    j_chooser.addOption("Flightstick", kFlightstick);
+    SmartDashboard.putData("Joystick choices", j_chooser);
 
     // Robot init
      // Set inverted for both side and make the drive train.
@@ -122,7 +122,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    joySelect = m_chooser.getSelected();
+    joySelect = j_chooser.getSelected();
 
     if(player!= null && !isAutonomous() && hasStarted) {
 			player.end(this);
