@@ -41,12 +41,12 @@ public class BTMacroPlay {
 	public void play(Robot robot) {
 		//if recordedAuto.csv has a double to read next, then read it
 		if ((scanner != null) && (scanner.hasNextDouble())) {
-			double deltaTime;
+			// double deltaTime;
 			
 			nextDouble = scanner.nextDouble();
 			
 			// Time recorded for values minus how far into replaying it we are--> if not zero, hold up
-			deltaTime = nextDouble - (System.currentTimeMillis()-startTime);
+			// deltaTime = nextDouble - (System.currentTimeMillis()-startTime);
 			
 			// For our 2020 robot, we have a setDrive method to convert joystick X and Y to tank drive.
 			// We save it in the order of joyX then joyY so we can call scanner.nextDouble() right as the perameters.

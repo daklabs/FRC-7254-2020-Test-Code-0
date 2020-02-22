@@ -100,6 +100,26 @@ public class Robot extends TimedRobot {
     private final Color redTarget = ColorMatch.makeColor(0.561, 0.232, 0.114);
     private final Color yellowTarget = ColorMatch.makeColor(0.361, 0.524, 0.113);
 
+    // Colors
+    private static final String RED = "Red";
+    private static final String GREEN = "Green";
+    private static final String BLUE = "Blue";
+    private static final String YELLOW = "Yellow";
+
+    // Colors offset 
+    // private static final String RedS = BLUE;
+    // private static final String GreenS = YELLOW;
+    // private static final String BlueS = RED;
+    // private static final String YellowS = YELLOW;
+
+    // Store color
+    String colorString;
+    String lastColor;
+
+    // Spinner controls
+    Boolean spin = false;
+    int spinCount = 0; // Count number of colors spun: 8 = 1 rotation
+
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
@@ -146,25 +166,24 @@ public class Robot extends TimedRobot {
     Color detectedColor = m_colorSensor.getColor();
 
     // Run the color match algorithm on our detected color
-    String colorString;
     ColorMatchResult match = m_colorMatcher.matchClosestColor(detectedColor);
 
     if (match.color == blueTarget) {
-      colorString = "Blue";
+      colorString = BLUE;
     } else if (match.color == redTarget) {
-      colorString = "Red";
+      colorString = RED;
     } else if (match.color == greenTarget) {
-      colorString = "Green";
+      colorString = GREEN;
     } else if (match.color == yellowTarget) {
-      colorString = "Yellow";
+      colorString = YELLOW;
     } else {
       colorString = "Unknown";
     }
 
     // Open Smart Dashboard or Shuffleboard to see the color detected by the sensor.
-    SmartDashboard.putNumber("Red", detectedColor.red);
-    SmartDashboard.putNumber("Green", detectedColor.green);
-    SmartDashboard.putNumber("Blue", detectedColor.blue);
+    SmartDashboard.putNumber(RED, detectedColor.red);
+    SmartDashboard.putNumber(GREEN, detectedColor.green);
+    SmartDashboard.putNumber(BLUE, detectedColor.blue);
     SmartDashboard.putNumber("Confidence", match.confidence);
     SmartDashboard.putString("Detected Color", colorString);
   }
@@ -241,8 +260,30 @@ public class Robot extends TimedRobot {
 
     // Spinner control -temp-
     double spinSpeed = 0;
-    if (joy.getRawButton(2)) {
+    if (joy.getRawButtonPressed(2)) {
+      lastColor = colorString;
+      spin = !spin;
+    }
+    if (spin == true) {
+      if (lastColor == RED && colorString == GREEN) {
+        spinCount++;
+        lastColor = colorString;
+      } else if (lastColor == GREEN && colorString == BLUE) {
+        spinCount++;
+        lastColor = colorString;
+      } else if (lastColor == BLUE && colorString == YELLOW) {
+        spinCount++;
+        lastColor = colorString;
+      } else if (lastColor == YELLOW && colorString == RED) {
+        spinCount++;
+        lastColor = colorString;
+      }
+      if (spinCount == 8*3) {
+        spin = false;
+      }
       spinSpeed = 0.5;
+    } else {
+      spinSpeed = 0;
     }
     spinner.set(spinSpeed);
   }
