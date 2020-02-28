@@ -30,6 +30,10 @@ import com.revrobotics.ColorSensorV3;
 import com.revrobotics.ColorMatchResult;
 import com.revrobotics.ColorMatch;
 
+// camera
+import edu.wpi.cscore.UsbCamera;
+import edu.wpi.first.cameraserver.CameraServer;
+
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to each mode, as described in the TimedRobot
@@ -150,6 +154,10 @@ public class Robot extends TimedRobot {
     Boolean spin = false;
     int spinCount = 0; // Count number of colors spun: 8 = 1 rotation
 
+  
+	// Camera
+	UsbCamera cam0 = CameraServer.getInstance().startAutomaticCapture();
+
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
@@ -178,6 +186,11 @@ public class Robot extends TimedRobot {
     m_colorMatcher.addColorMatch(greenTarget);
     m_colorMatcher.addColorMatch(redTarget);
     m_colorMatcher.addColorMatch(yellowTarget); 
+
+    // camera setup
+    // If it lags, it's the field
+    cam0.setFPS(15);
+    cam0.setResolution(160, 120);
   }
 
   /**
@@ -218,9 +231,9 @@ public class Robot extends TimedRobot {
     }
 
     // Open Smart Dashboard or Shuffleboard to see the color detected by the sensor.
-    SmartDashboard.putNumber(RED, detectedColor.red);
-    SmartDashboard.putNumber(GREEN, detectedColor.green);
-    SmartDashboard.putNumber(BLUE, detectedColor.blue);
+    // SmartDashboard.putNumber(RED, detectedColor.red);
+    // SmartDashboard.putNumber(GREEN, detectedColor.green);
+    // SmartDashboard.putNumber(BLUE, detectedColor.blue);
     SmartDashboard.putNumber("Confidence", match.confidence);
     SmartDashboard.putString("Detected Color", colorString);
   }
@@ -382,7 +395,7 @@ public class Robot extends TimedRobot {
   }
 
   public void setDrive(double joyX, double joyY) {
-    double y = joyY * 0.6;
+    double y = joyY * (joy.getRawButton(1) ? 0.9 : 0.6);
     double x = joyX * 0.4;
 
     //System.out.println("X: " + x + " Y: " + y);
