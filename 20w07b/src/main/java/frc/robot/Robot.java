@@ -9,6 +9,8 @@ package frc.robot;
 
 // Robot
 import edu.wpi.first.wpilibj.TimedRobot;
+// Field
+import edu.wpi.first.wpilibj.DriverStation;
 // Interface
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -129,10 +131,10 @@ public class Robot extends TimedRobot {
     private final ColorMatch m_colorMatcher = new ColorMatch();
 
     // Sample calabration, might need to be changed
-    private final Color blueTarget = ColorMatch.makeColor(0.143, 0.427, 0.429);
-    private final Color greenTarget = ColorMatch.makeColor(0.197, 0.561, 0.240);
-    private final Color redTarget = ColorMatch.makeColor(0.561, 0.232, 0.114);
-    private final Color yellowTarget = ColorMatch.makeColor(0.361, 0.524, 0.113);
+    private final Color blueTarget = ColorMatch.makeColor(0.147, 0.431, 0.422);
+    private final Color greenTarget = ColorMatch.makeColor(0.197, 0.551, 0.250);
+    private final Color redTarget = ColorMatch.makeColor(0.444, 0.387, 0.166);
+    private final Color yellowTarget = ColorMatch.makeColor(0.311, 0.554, 0.123);
 
     // Colors
     private static final String RED = "Red";
@@ -141,10 +143,10 @@ public class Robot extends TimedRobot {
     private static final String YELLOW = "Yellow";
 
     // Colors offset 
-    // private static final String RedS = BLUE;
-    // private static final String GreenS = YELLOW;
-    // private static final String BlueS = RED;
-    // private static final String YellowS = YELLOW;
+    private static final String RedS = BLUE;
+    private static final String GreenS = YELLOW;
+    private static final String BlueS = RED;
+    private static final String YellowS = YELLOW;
 
     // Store color
     String colorString;
@@ -154,6 +156,8 @@ public class Robot extends TimedRobot {
     Boolean spin = false;
     int spinCount = 0; // Count number of colors spun: 8 = 1 rotation
 
+    // Requested color
+    String gameData;
   
 	// Camera
 	UsbCamera cam0 = CameraServer.getInstance().startAutomaticCapture();
@@ -231,6 +235,7 @@ public class Robot extends TimedRobot {
     }
 
     // Open Smart Dashboard or Shuffleboard to see the color detected by the sensor.
+    SmartDashboard.putNumber("Rotations: ", spinCount / 8);
     // SmartDashboard.putNumber(RED, detectedColor.red);
     // SmartDashboard.putNumber(GREEN, detectedColor.green);
     // SmartDashboard.putNumber(BLUE, detectedColor.blue);
@@ -292,6 +297,7 @@ public class Robot extends TimedRobot {
   // spin color wheel, then more lemons, then set color.
   @Override
   public void teleopPeriodic() {
+    // Drive
     setDrive(getTurn(), getFoward());
 
     // Elevator control -temp-
@@ -301,16 +307,20 @@ public class Robot extends TimedRobot {
       elevatorSpeed = 0.4;
     } else if (joy.getPOV() == 180) {
       elevatorSpeed = -0.8;
+    } else if (joy.getRawButton(11)) {
+      elevatorSpeed = -0.4;
     }
     elevator.set(elevatorSpeed);
 
     // Spinner control -temp-
     double spinSpeed = 0;
+    gameData = DriverStation.getInstance().getGameSpecificMessage();
     if (joy.getRawButtonPressed(2)) {
       lastColor = colorString;
       spin = !spin;
     }
     if (spin == true && spinCount < 8*3) {
+      spinSpeed = -0.5; //TODO: Build mirrored the colors, so this needs to be changed for the compotition
       if (lastColor == RED && colorString == GREEN) {
         spinCount++;
         lastColor = colorString;
@@ -327,7 +337,37 @@ public class Robot extends TimedRobot {
       if (spinCount == 8*3) {
         spin = false;
       }
+    } else if( spin == true && gameData.length() > 0) {
       spinSpeed = 0.5;
+      switch (gameData.charAt(0)) {
+        case 'B' :
+          //Blue case
+          if (colorString == BlueS) {
+            spin = false;
+          }
+          break;
+        case 'G' :
+          //Green case
+          if (colorString == GreenS) {
+            spin = false;
+          }
+          break;
+        case 'R' :
+          //Red case
+          if (colorString == RedS) {
+            spin = false;
+          }
+          break;
+        case 'Y' :
+          //Yellow case
+          if (colorString == YellowS) {
+            spin = false;
+          }
+          break;
+        default :
+          //This is corrupt data
+          break;
+      }
     } else {
       spinSpeed = 0;
     }
@@ -395,7 +435,7 @@ public class Robot extends TimedRobot {
   }
 
   public void setDrive(double joyX, double joyY) {
-    double y = joyY * (joy.getRawButton(1) ? 0.9 : 0.6);
+    double y = joyY * (joy.getRawButton(1) ? 0.9 : 0.5);
     double x = joyX * 0.4;
 
     //System.out.println("X: " + x + " Y: " + y);
