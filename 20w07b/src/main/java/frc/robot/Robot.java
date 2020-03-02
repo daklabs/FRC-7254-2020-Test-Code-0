@@ -146,7 +146,7 @@ public class Robot extends TimedRobot {
     private static final String RedS = BLUE;
     private static final String GreenS = YELLOW;
     private static final String BlueS = RED;
-    private static final String YellowS = YELLOW;
+    private static final String YellowS = GREEN;
 
     // Store color
     String colorString;
@@ -288,10 +288,12 @@ public class Robot extends TimedRobot {
     }
   }
 
-  // @Override
-  // public void teleopInit() {
-    
-  // }
+  @Override
+  public void teleopInit() {
+    // Reset spin controls.
+    spin = false;
+    spinCount = 0;
+  }
 
   // This function is called periodically during operator control.
   // spin color wheel, then more lemons, then set color.
