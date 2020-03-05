@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-//import com.ctre.phoenix.motorcontrol.InvertType;
+// Mortor control
 import com.ctre.phoenix.motorcontrol.can.*;
 
 // Color sensor
@@ -66,10 +66,12 @@ public class Robot extends TimedRobot {
 
     // Motor - Elevator
     WPI_VictorSPX elevator = new WPI_VictorSPX(12);
+    // Motors - Hooks, TODO: flash the controllers
+    WPI_VictorSPX armLeft = new WPI_VictorSPX(0);
+    WPI_VictorSPX armRight = new WPI_VictorSPX(15);
 
     // Motor - Spinner
     WPI_VictorSPX spinner = new WPI_VictorSPX(3);
-
 
     // Joystick
     Joystick joy = new Joystick(0);
@@ -118,6 +120,27 @@ public class Robot extends TimedRobot {
 
     Boolean getRecordButton() {
       return joy.getRawButtonPressed(11);
+    }
+
+    Boolean getStallButton() {
+      Boolean button;
+      switch (joySelect) {
+        case kXboxJoy:
+          // XBox controler is selected.
+          button = joy.getRawButton(4);
+  
+          break;
+        case kFlightstick:
+          // Flightstick is selected.
+          button = joy.getRawButton(11);
+  
+          break;
+        default:
+          // So it doesn't yell at me.
+          button = false;
+          break;
+      }
+      return button;
     }
   
   // Color Sensor
@@ -304,17 +327,28 @@ public class Robot extends TimedRobot {
 
     // Elevator control -temp-
     double elevatorSpeed = 0;
-    //gets the hat input, -1 for no input, 0 for up, 180 for down
+    double armSpeed = 0;
+    // Get hook buttons (5 and 6 on flightstick, L/R bumpers on Xbox)
+    if (joy.getRawButton(5)) {
+      armSpeed = 0.15;
+    }
+    if (joy.getRawButton(6)) {
+      armSpeed = -0.15;
+    }
+    // Gets the hat input, -1 for no input, 0 for up, 180 for down
+    // Hat has priority over hold button
     if (joy.getPOV() == 0) {
       elevatorSpeed = 0.4;
     } else if (joy.getPOV() == 180) {
       elevatorSpeed = -0.8;
-    } else if (joy.getRawButton(11)) {
+    } else if (getStallButton()) {
       elevatorSpeed = -0.4;
     }
     elevator.set(elevatorSpeed);
+    armLeft.set(-armSpeed);
+    armRight.set(armSpeed);
 
-    // Spinner control -temp-
+    // Spinner control
     double spinSpeed = 0;
     gameData = DriverStation.getInstance().getGameSpecificMessage();
     if (joy.getRawButtonPressed(2)) {
