@@ -48,8 +48,9 @@ public class BTMacroRecord {
 			// Get input
 			writer.append("," + robot.joystickX);
 			writer.append("," + robot.joystickY);
+			writer.append("," + robot.notLimit);
 
-			//drive motors
+			// drive motors
 			// writer.append("," + robot.leftDrive.get());
 			// writer.append("," + robot.leftSlave.get());
 			// writer.append("," + robot.rightDrive.get());		

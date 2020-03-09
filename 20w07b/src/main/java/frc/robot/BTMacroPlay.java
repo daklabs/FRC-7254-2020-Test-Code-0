@@ -50,7 +50,7 @@ public class BTMacroPlay {
 			
 			// For our 2020 robot, we have a setDrive method to convert joystick X and Y to tank drive.
 			// We save it in the order of joyX then joyY so we can call scanner.nextDouble() right as the perameters.
-			robot.setDrive(scanner.nextDouble(), scanner.nextDouble());
+			robot.setDrive(scanner.nextDouble(), scanner.nextDouble(), scanner.nextBoolean());
 			
 			//go to next double
 			onTime = true;
@@ -68,7 +68,7 @@ public class BTMacroPlay {
 	
 	//stop motors and end playing the recorded file
 	public void end(Robot robot) {
-		robot.setDrive(scanner.nextDouble(), scanner.nextDouble());
+		robot.setDrive(scanner.nextDouble(), scanner.nextDouble(), scanner.nextBoolean());
 
 		// robot.leftDrive.set(0);
         // robot.leftSlave.set(0);

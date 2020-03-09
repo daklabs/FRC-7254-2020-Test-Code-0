@@ -66,7 +66,7 @@ public class Robot extends TimedRobot {
 
     // Motor - Elevator
     WPI_VictorSPX elevator = new WPI_VictorSPX(12);
-    // Motors - Hooks, TODO: flash the controllers
+    // Motors - Hooks
     WPI_VictorSPX armLeft = new WPI_VictorSPX(0);
     WPI_VictorSPX armRight = new WPI_VictorSPX(15);
 
@@ -78,6 +78,7 @@ public class Robot extends TimedRobot {
 
     double joystickX = 0;
     double joystickY = 0;
+    boolean notLimit = false;
 
     double getTurn(){
       return joy.getRawAxis(0);
@@ -112,7 +113,7 @@ public class Robot extends TimedRobot {
     //few different auto programs
     static final int autoNumber = 1;
     //autoFile is a global constant that keeps you from recording into a different file than the one you play from
-    static final String autoFile = new String("/home/lvuser/recordedAuto" + autoNumber + ".csv");
+    static final String autoPath = new String("/home/lvuser/recordedAuto/");
     
     //Play and record file
     BTMacroPlay player = null;
@@ -284,14 +285,18 @@ public class Robot extends TimedRobot {
     // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
     System.out.println("Auto selected: " + m_autoSelected);
 
+    String autoFile = null;
     // Potential to change the macro
     switch (m_autoSelected) {
+      case kDefaultAuto:
+        autoFile = autoPath + 0 + ".csv";
+        break;
       case kCustomAuto:
         // Put custom auto code here
+        autoFile = autoPath + 1 + ".csv";
         break;
-      case kDefaultAuto:
       default:
-        // Put default auto code here
+        // Do nothing, bad data
         break;
     }
 
@@ -323,7 +328,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     // Drive
-    setDrive(getTurn(), getFoward());
+    setDrive(getTurn(), getFoward(), joy.getRawButton(1));
 
     // Elevator control -temp-
     double elevatorSpeed = 0;
@@ -344,7 +349,7 @@ public class Robot extends TimedRobot {
     } else if (getStallButton()) {
       elevatorSpeed = -0.4;
     }
-    elevator.set(elevatorSpeed);
+    elevator.set(-elevatorSpeed);
     armLeft.set(-armSpeed);
     armRight.set(armSpeed);
 
@@ -412,6 +417,20 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testInit() {
+    String autoFile = null;
+    // Potential to change the macro
+    switch (m_autoSelected) {
+      case kDefaultAuto:
+        autoFile = autoPath + 0 + ".csv";
+        break;
+      case kCustomAuto:
+        // Put custom auto code here
+        autoFile = autoPath + 1 + ".csv";
+        break;
+      default:
+        // Do nothing, bad data
+        break;
+    }
     try {
 			recorder = new BTMacroRecord(autoFile);
 		} catch (IOException e) {
@@ -425,9 +444,10 @@ public class Robot extends TimedRobot {
     //Save input
     joystickX = getTurn();
     joystickY = getFoward();
+    notLimit = joy.getRawButton(1);
     
     // Drive
-    setDrive(joystickX , joystickY);
+    setDrive(joystickX , joystickY, notLimit);
     //setDrive(joy.getX(), -joy.getY());
     
     // Toggle recording
@@ -470,9 +490,9 @@ public class Robot extends TimedRobot {
     }
   }
 
-  public void setDrive(double joyX, double joyY) {
-    double y = joyY * (joy.getRawButton(1) ? 0.9 : 0.5);
-    double x = joyX * 0.4;
+  public void setDrive(double joyX, double joyY, boolean notlimitSpeed) {
+    double y = joyY * (notlimitSpeed ? 0.9 : 0.5 );
+    double x = joyX * (notlimitSpeed ? 0.8 : 0.4 );
 
     //System.out.println("X: " + x + " Y: " + y);
   
